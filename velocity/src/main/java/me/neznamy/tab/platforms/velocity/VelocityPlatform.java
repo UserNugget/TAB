@@ -17,6 +17,7 @@ import me.neznamy.tab.shared.hook.AdventureHook;
 import me.neznamy.tab.shared.hook.PremiumVanishHook;
 import me.neznamy.tab.shared.proxy.ProxyPlatform;
 import me.neznamy.tab.shared.util.ReflectionUtils;
+import net.elytrium.limboapi.LimboAPI;
 import net.kyori.adventure.text.Component;
 import org.bstats.charts.SimplePie;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,9 @@ public class VelocityPlatform extends ProxyPlatform {
     @NotNull
     private final VelocityTAB plugin;
 
+    @Getter
+    private final LimboAPI limbo;
+
     /** Plugin message channel */
     @Getter
     private final MinecraftChannelIdentifier MCI = MinecraftChannelIdentifier.from(TabConstants.PLUGIN_MESSAGE_CHANNEL_NAME);
@@ -44,6 +48,7 @@ public class VelocityPlatform extends ProxyPlatform {
      */
     public VelocityPlatform(VelocityTAB plugin) {
         this.plugin = plugin;
+        this.limbo = (LimboAPI) plugin.getServer().getPluginManager().getPlugin("limboapi").get().getInstance().get();
         if (plugin.getServer().getPluginManager().isLoaded("premiumvanish")) {
             PremiumVanishHook.setInstance(new VelocityPremiumVanishHook());
         }

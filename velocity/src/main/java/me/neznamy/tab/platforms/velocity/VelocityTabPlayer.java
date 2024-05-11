@@ -43,6 +43,7 @@ public class VelocityTabPlayer extends ProxyTabPlayer {
     public VelocityTabPlayer(@NotNull VelocityPlatform platform, @NotNull Player p) {
         super(platform, p, p.getUniqueId(), p.getUsername(), p.getCurrentServer().map(s ->
                 s.getServerInfo().getName()).orElse("null"), p.getProtocolVersion().getProtocol());
+        this.tabList.setLimbo(platform.getLimbo());
     }
     
     @Override

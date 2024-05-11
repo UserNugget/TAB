@@ -3,9 +3,11 @@ package me.neznamy.tab.platforms.velocity;
 import com.velocitypowered.api.proxy.player.TabListEntry;
 import com.velocitypowered.api.util.GameProfile;
 import lombok.NonNull;
+import lombok.Setter;
 import me.neznamy.tab.shared.TAB;
 import me.neznamy.tab.shared.platform.TabList;
 import me.neznamy.tab.shared.platform.TabPlayer;
+import net.elytrium.limboapi.LimboAPI;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +19,9 @@ import java.util.*;
  */
 public class VelocityTabList extends TabList<VelocityTabPlayer, Component> {
 
+    @Setter
+    private LimboAPI limbo;
+
     /**
      * Constructs new instance.
      *
@@ -27,33 +32,42 @@ public class VelocityTabList extends TabList<VelocityTabPlayer, Component> {
         super(player);
     }
 
+    private UUID rewriteUuid(UUID uuid) {
+      if (this.limbo != null && this.player.getPlayer().getUniqueId().equals(uuid)) {
+        return this.limbo.getInitialID(this.player.getPlayer());
+      }
+
+      return uuid;
+    }
+
     @Override
     public void removeEntry(@NonNull UUID entry) {
-        player.getPlayer().getTabList().removeEntry(entry);
+        player.getPlayer().getTabList().removeEntry(this.rewriteUuid(entry));
     }
 
     @Override
     public void updateDisplayName0(@NonNull UUID entry, @Nullable Component displayName) {
-        player.getPlayer().getTabList().getEntry(entry).ifPresent(e -> e.setDisplayName(displayName));
+        player.getPlayer().getTabList().getEntry(this.rewriteUuid(entry)).ifPresent(e -> e.setDisplayName(displayName));
     }
 
     @Override
     public void updateLatency(@NonNull UUID entry, int latency) {
-        player.getPlayer().getTabList().getEntry(entry).ifPresent(e -> e.setLatency(latency));
+        player.getPlayer().getTabList().getEntry(this.rewriteUuid(entry)).ifPresent(e -> e.setLatency(latency));
     }
 
     @Override
     public void updateGameMode(@NonNull UUID entry, int gameMode) {
-        player.getPlayer().getTabList().getEntry(entry).ifPresent(e -> e.setGameMode(gameMode));
+        player.getPlayer().getTabList().getEntry(this.rewriteUuid(entry)).ifPresent(e -> e.setGameMode(gameMode));
     }
 
     @Override
     public void updateListed(@NonNull UUID entry, boolean listed) {
-        player.getPlayer().getTabList().getEntry(entry).ifPresent(e -> e.setListed(listed));
+        player.getPlayer().getTabList().getEntry(this.rewriteUuid(entry)).ifPresent(e -> e.setListed(listed));
     }
 
     @Override
     public void addEntry0(@NonNull UUID id, @NonNull String name, @Nullable Skin skin, boolean listed, int latency, int gameMode, @Nullable Component displayName) {
+        id = this.rewriteUuid(id);
         TabListEntry e = TabListEntry.builder()
                 .tabList(player.getPlayer().getTabList())
                 .profile(new GameProfile(
@@ -86,13 +100,13 @@ public class VelocityTabList extends TabList<VelocityTabPlayer, Component> {
 
     @Override
     public boolean containsEntry(@NonNull UUID entry) {
-        return player.getPlayer().getTabList().containsEntry(entry);
+        return player.getPlayer().getTabList().containsEntry(this.rewriteUuid(entry));
     }
 
     @Override
     public void checkDisplayNames() {
         for (TabPlayer target : TAB.getInstance().getOnlinePlayers()) {
-            player.getPlayer().getTabList().getEntry(target.getUniqueId()).ifPresent(entry -> {
+            player.getPlayer().getTabList().getEntry(this.rewriteUuid(target.getUniqueId())).ifPresent(entry -> {
                 Component expectedComponent = getExpectedDisplayName(target);
                 if (expectedComponent != null && entry.getDisplayNameComponent().orElse(null) != expectedComponent) {
                     displayNameWrong(entry.getProfile().getName(), player);
