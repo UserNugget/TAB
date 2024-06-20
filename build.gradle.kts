@@ -2,6 +2,7 @@ plugins {
     id("tab.parent")
 }
 
+
 allprojects {
     group = "me.neznamy"
     version = "4.1.7-SNAPSHOT"
