@@ -14,6 +14,8 @@ import net.md_5.bungee.protocol.packet.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Scoreboard handler for BungeeCord. Because it does not offer
@@ -158,8 +160,9 @@ public class BungeeScoreboard extends Scoreboard<BungeeTabPlayer, BaseComponent>
         }
         if (isAntiOverrideTeams() && packet instanceof Team) {
             Team team = (Team) packet;
-            if (team.getMode() == TeamAction.REMOVE || team.getMode() == TeamAction.UPDATE) return;
-            team.setPlayers(onTeamPacket(team.getMode(), team.getName(), Lists.newArrayList(team.getPlayers())).toArray(new String[0]));
+            if (team.getMode() == TeamAction.UPDATE) return;
+            List<String> players = team.getPlayers() == null ? Collections.emptyList() : Lists.newArrayList(team.getPlayers());
+            team.setPlayers(onTeamPacket(team.getMode(), team.getName(), players).toArray(new String[0]));
         }
     }
 }
